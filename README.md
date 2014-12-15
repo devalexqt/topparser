@@ -48,7 +48,7 @@ KiB Swap:   753660 total,   309592 used,   444068 free.   163452 cached Mem
 ```
 
 JSON output:
-``` json
+``` 
 { process: 
    [ { pid: '1990',
        user: 'alex',
