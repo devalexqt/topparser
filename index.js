@@ -47,7 +47,7 @@
 	if(pid_limit){
 		if(pid_limit>=data_line.length-1){pid_limit=data_line.length-1}
 	}//if pid_limit
-	else{pid_limit=data_line.length-1}
+	else{pid_limit=data_line.length-1+7}
 	for(var i=7,item=data_line[i];i<pid_limit;item=data_line[++i]){
 		var line=item.replace(/\s{1,}/g, ',').substring(1)
 			if(line!=""){
