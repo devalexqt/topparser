@@ -1,0 +1,28 @@
+{
+  "name": "topparser",
+  "version": "0.0.1",
+  "description": "Parse linux TOP command output to JSON format.",
+  "main": "index.js",
+  "scripts": {
+    "test": "\"echo \\\"Erorr: no test specified\\\"  && exit 1\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devalexqt/topparser"
+  },
+  "keywords": [
+    "top",
+    "linux",
+    "parser",
+    "json",
+    "command",
+    "format",
+    "node",
+    "js"
+  ],
+  "author": "alex",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/devalexqt/topparser/issues"
+  }
+}
