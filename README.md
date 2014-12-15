@@ -11,7 +11,7 @@ npm install git://github.com/devalexqt/topparser.git
 ``` javascript
 var topparser=require("topparser")
 ...
-console.dir(topparser.parse(data))
+console.dir(topparser.parse(data,pid_limit))// pid_limit - limit process count to same number
 ```
 
 #Example
