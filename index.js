@@ -32,7 +32,7 @@
 		_result.process.push(process)
 	}//parseProces
 
-	function parse(data){
+	function parse(data,pid_limit){
 		if(!data){return}
 		var result={process:[]}
 		var data_line=data.split("\n")
@@ -44,7 +44,11 @@
 	parseLine(result,"swap",data_line[4].replace("free.","free,"))	
 
 	//process
-	for(var i=7,item=data_line[i];i<data_line.length-1;item=data_line[++i]){
+	if(pid_limit){
+		if(pid_limit>=data_line.length-1){pid_limit=data_line.length-1}
+	}//if pid_limit
+	else{pid_limit=data_line.length-1}
+	for(var i=7,item=data_line[i];i<pid_limit;item=data_line[++i]){
 		var line=item.replace(/\s{1,}/g, ',').substring(1)
 			if(line!=""){
 				parseProces(result,line)
