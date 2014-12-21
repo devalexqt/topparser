@@ -14,7 +14,7 @@ var topparser=require("topparser")
 console.dir(topparser.parse(data,pid_limit))// pid_limit - limit process count to same number
 ```
 
-# On Windows PC run from cygvin
+# On Windows PC run from cygwin terminal
 
 #Example
 raw top output
