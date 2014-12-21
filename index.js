@@ -39,7 +39,7 @@
 	//sys info
 	//parseLine("top",data_line[0])
 	parseLine(result,"task",data_line[1])
-	parseLine(result,"cpu",data_line[2].replace(" us,","user,").replace(" sy,"," system,").replace("  id,"," idle,"))
+	parseLine(result,"cpu",data_line[2].replace(" us,","user,").replace(" sy,"," system,").replace(" id,"," idle,"))
 	//console.dir(data_line[2])
 	//console.dir(data_line[3])
 	parseLine(result,"ram",data_line[3].replace(RegExp("k ","g")," ") )
