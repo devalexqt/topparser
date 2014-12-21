@@ -1,6 +1,6 @@
 
 #Description
-Parse linux TOP command output to JSON format.
+Parse linux TOP command output to JSON format uding <b>node.js</b> .
 
 #Install
 ```
@@ -13,6 +13,8 @@ var topparser=require("topparser")
 ...
 console.dir(topparser.parse(data,pid_limit))// pid_limit - limit process count to same number
 ```
+
+# On Windows PC run from cygvin
 
 #Example
 raw top output
@@ -136,15 +138,7 @@ JSON output:
        command: 'kworker/0:0' }
 ],
   task: { total: 194, running: 1, sleeping: 193, stopped: 0, zombie: 0 },
-  cpu: 
-   { us: 0.9,
-     sy: 3.1,
-     ni: 0.1,
-     '.0id': 95,
-     wa: 0.3,
-     hi: 0.6,
-     si: 0,
-     st: 0 },
+  cpu: { user: 0.9,system: 3.1,ni: 0.1,'idle': 95,wa: 0.3,hi: 0.6,si: 0,st: 0 },
   ram: { total: 727308, used: 664028, free: 63280, buffers: 7600 },
   swap: { total: 753660, used: 309516, free: 444144, cachedMem: 187424 } }
 ```
