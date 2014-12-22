@@ -1,6 +1,6 @@
 
 #Description
-Parse linux TOP command output to JSON format uding <b>node.js</b> .
+Parse linux TOP command output to JSON format using <b>node.js</b> .
 
 #Install
 ```
