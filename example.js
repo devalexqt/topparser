@@ -1,7 +1,7 @@
 var topparser=require("./index.js")//topparser
 
-    //start topparser    
-    topparser.start({pid_limit:1})
+    //start topparser, limit number of processes to include in list    
+    topparser.start({pid_limit:10})
 
     //then data is available
     topparser.on("data",data=>{
