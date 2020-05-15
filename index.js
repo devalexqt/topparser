@@ -1,67 +1,67 @@
+// windows cygwin: http://superuser.com/questions/630351/top-command-in-cygwin
+var EventEmitter = require('events')
+var parser=require("./parser.js")
+var spawn = require('child_process').spawn
+var   proc=null
+var startTime=0
 
+class TopEmitter extends EventEmitter {}
 
-	function parseLine(_result,_name,_line){
-		var line=_line.replace(RegExp("%","g"),"").split(":")[1].replace(RegExp(" ","g"),"")
-			_result[_name]={}
-			var line_items=line.split(",")
+var topEmitter = new TopEmitter()
 
-			for(var i=0,item=line_items[i];i<line_items.length;item=line_items[++i]){
-				var value=parseFloat(item)
-				if(value==0&&item.indexOf(".")!=-1){value="0.0"}
-				var name=item.replace(value,"").replace(".0","")
-				_result[_name][name]=parseFloat(value)
-			}//for
-	}//parseLine
+// {
+// 	pid_limit:10,//limit number of process to be parsed
+// }
+topEmitter.start=(options)=>{//pid_limit,callback
+	var options=options||{}
 
-	function parseProces(_result,_line){
-		var items=_line.split(",")
-		var process={
-				pid:items[0],
-				user:items[1],
-				pr:items[2],
-				ni:items[3],
-				virt:items[4],
-				res:items[5],
-				shr:items[6],
-				s:items[7],
-				cpu:items[8],
-				mem:items[9],
-				time:items[10],
-				command:items[11]
-		}
-		_result.process.push(process)
-	}//parseProces
+	startTime=new Date().getTime()
+	proc= spawn('top', ['-l',"0"])// mac: "top -l 0", linux: ['-b',"-d","1"]
+	console.log("started process, pid: "+proc.pid)
+	var top_data=""
 
-	function parse(data,pid_limit){
-		if(!data){return}
-		var result={process:[]}
-		var data_line=data.split("\n")
-	//sys info
-	//parseLine("top",data_line[0])
-	parseLine(result,"task",data_line[1])
-	parseLine(result,"cpu",data_line[2].replace(" us,","user,").replace(" sy,"," system,").replace(" id,"," idle,"))
-	//console.dir(data_line[2])
-	//console.dir(data_line[3])
-	parseLine(result,"ram",data_line[3].replace(RegExp("k ","g")," ") )
-	parseLine(result,"swap",data_line[4].replace("free.","free,"))	
+	proc.stdout.on('data',data=>{
+	//   console.log('stdout: ' + data);
+	  top_data+=data.toString()
+	  processData(top_data)
+	})
 
-	//process
-	if(pid_limit){
-		if(pid_limit>=data_line.length-1){pid_limit=data_line.length-1}else{pid_limit+=7}
-	}//if pid_limit
-	else{pid_limit=data_line.length-1}
-	for(var i=7,item=data_line[i];i<pid_limit;item=data_line[++i]){
-		if(item){
-		var line=item.replace(/\s{1,}/g, ',').substring(1)
-			if(line!=""){
-				parseProces(result,line)
-			}//if
-		}//if item
-				}//for process
-	result.time=new Date().getTime()				
+	proc.on('close', code=>{
+	  console.log('child process exited with code:',code)
+	  topEmitter.emit("close",{code})// then precess was stopped
+	})
 
-	return result
-	}//parse
+	proc.stderr.on("data",data=>{
+		console.log("error:",data.toString())
+	})
 
+	proc.on("error",error=>{
+		console.log('child process exited with error:',error);
+		topEmitter.emit("error",{error})
+	})
 
-exports.parse=parse;
+	//add on error
+
+	var processData=(_data)=>{
+		var start=_data.indexOf("top - ")
+		var end=_data.indexOf("top - ",start+1)
+		if(end==-1||end==start){return}
+		var data=_data.slice(start,end)
+			//console.dir(parser.parse(data,3))
+			var result=parser.parse(data,options.pid_limit)
+				//result.time-=startTime
+				//result.time*=1000
+			//if(callback){callback(null,result)}
+			topEmitter.emit("data",result)
+		top_data=_data.replace(data,"")
+	}//processData
+	return true
+}//start
+
+topEmitter.stop=()=>{
+	console.log("stoped process...")
+	if(proc){proc.kill('SIGINT')}// SIGHUP -linux ,SIGINT -windows
+}//stop
+
+module.exports=topEmitter
+

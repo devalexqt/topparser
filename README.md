@@ -1,8 +1,14 @@
 
-#Description
-Parse linux TOP command output to JSON format using <b>node.js</b> .
+## Description
+Parse linux TOP command output to JSON format using <b>node.js without external dependency.</b> .
 
-#Install
+## Test
+Automatically run linux `top` command and parse it's output to json format.
+```
+npm run start
+```
+
+## Install
 ```
 npm install git://github.com/devalexqt/topparser.git
 ```
@@ -12,10 +18,10 @@ npm install git://github.com/devalexqt/topparser.git
 ``` javascript
 var topparser=require("topparser")
 ...
-console.dir(topparser.parse(data,pid_limit))// pid_limit - limit process count to same number
+console.dir(topparser.parse(data,pid_limit))// pid_limit - limit numbers of processes
 ```
 
-# On Windows PC run from cygwin terminal
+## On Windows PC run from cygwin terminal
 
 #Example
 raw top output
