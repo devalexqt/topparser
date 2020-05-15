@@ -13,6 +13,11 @@ var topparser=require("./index.js")//topparser
         console.log(error)
     })
 
+    //if top exit
+    topparser.on("close",code=>{
+        console.log(code)
+    })
+
     //stop topparser after 10 seconds
     setTimeout(()=>{
         topparser.stop()

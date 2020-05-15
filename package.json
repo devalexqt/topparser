@@ -1,6 +1,6 @@
 {
   "name": "topparser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Parse linux TOP command output to JSON format.",
   "main": "index.js",
   "scripts": {
