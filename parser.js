@@ -1,5 +1,3 @@
-
-
 	function parseLine(_result,_name,_line){
 		var line=_line.replace(RegExp("%","g"),"").split(":")[1].replace(RegExp(" ","g"),"")
 			_result[_name]={}
@@ -15,7 +13,7 @@
 
 	function parseProces(_result,_line){
 		var items=_line.split(",")
-		var process={
+		var processes={
 				pid:items[0],
 				user:items[1],
 				pr:items[2],
@@ -29,12 +27,12 @@
 				time:items[10],
 				command:items[11]
 		}
-		_result.process.push(process)
+		_result.processes.push(processes)
 	}//parseProces
 
 	function parse(data,pid_limit){
 		if(!data){return}
-		var result={process:[]}
+		var result={processes:[]}
 		var data_line=data.split("\n")
 	//sys info
 	//parseLine("top",data_line[0])

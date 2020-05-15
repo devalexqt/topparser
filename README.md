@@ -1,9 +1,8 @@
-
-## Description
-Parse linux TOP command output to JSON format using <b>node.js without external dependency.</b> .
+## Parse linux "top" command to json format
+Parse linux TOP command output to JSON format using <b>node.js</b> without external dependencies.
 
 ## Test
-Automatically run linux `top` command and parse it's output to json format.
+Just run:
 ```
 npm run start
 ```
@@ -11,17 +10,35 @@ npm run start
 ## Install
 ```
 npm install git://github.com/devalexqt/topparser.git
+or 
+npm install topparser
 ```
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=3.14pi@ukr.net&lc=US&no_note=0&currency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest&item_number=topparser)
 
-#Usage
+## Usage
 ``` javascript
-var topparser=require("topparser")
-...
-console.dir(topparser.parse(data,pid_limit))// pid_limit - limit numbers of processes
+var topparser=require("topparser")//topparser
+
+    //start topparser    
+    topparser.start({pid_limit:1})
+
+    //then data is available
+    topparser.on("data",data=>{
+        console.log(data)
+    })
+
+    //if some error happens
+    topparser.on("error",error=>{
+        console.log(error)
+    })
+
+    //stop topparser after 10 seconds
+    setTimeout(()=>{
+        topparser.stop()
+    },10000)
 ```
 
-## On Windows PC run from cygwin terminal
+## On Windows PC you can use WSL (windows subsystem for linux)
 
 #Example
 raw top output
@@ -58,7 +75,12 @@ KiB Swap:   753660 total,   309592 used,   444068 free.   163452 cached Mem
 
 JSON output:
 ``` 
-{ process: 
+{ 
+  task: { total: 194, running: 1, sleeping: 193, stopped: 0, zombie: 0 },
+  cpu: { user: 0.9,system: 3.1,ni: 0.1,'idle': 95,wa: 0.3,hi: 0.6,si: 0,st: 0 },
+  ram: { total: 727308, used: 664028, free: 63280, buffers: 7600 },
+  swap: { total: 753660, used: 309516, free: 444144, cachedMem: 187424 } },
+  processes: 
    [ { pid: '1990',
        user: 'alex',
        pr: '20',
@@ -144,8 +166,4 @@ JSON output:
        time: '0:00.00',
        command: 'kworker/0:0' }
 ],
-  task: { total: 194, running: 1, sleeping: 193, stopped: 0, zombie: 0 },
-  cpu: { user: 0.9,system: 3.1,ni: 0.1,'idle': 95,wa: 0.3,hi: 0.6,si: 0,st: 0 },
-  ram: { total: 727308, used: 664028, free: 63280, buffers: 7600 },
-  swap: { total: 753660, used: 309516, free: 444144, cachedMem: 187424 } }
 ```
