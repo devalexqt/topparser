@@ -1,10 +1,13 @@
-## Parse linux "top" command to json format
-Parse linux TOP command output to JSON format using <b>node.js</b> without external dependencies.
+## Parse linux / Unix "top" command to json format
+Parse unix TOP command raw output to JSON format using <b>node.js</b> without external dependencies. On Windows PC you can use WSL (windows subsystem for linux).
 
 ## Test
 Just run:
 ```
+//navigate to module folder and run
 npm run start
+or
+node example.js
 ```
 
 ## Install
@@ -15,14 +18,15 @@ npm install topparser
 
 ## Usage
 ``` javascript
-var topparser=require("topparser")//topparser
+var topparser=require("topparser")
 
-    //start topparser    
-    topparser.start({pid_limit:1})
+
+    //start topparser
+    topparser.start()
 
     //then data is available
     topparser.on("data",data=>{
-        console.log(data)
+        console.log(JSON.stringify(data,0,2))
     })
 
     //if some error happens
@@ -30,138 +34,103 @@ var topparser=require("topparser")//topparser
         console.log(error)
     })
 
-    //stop topparser after 10 seconds
+    //if topparser exit
+    topparser.on("close",code=>{
+        console.log(code)
+    })
+
+    //kill topparser after 10 seconds, for example
     setTimeout(()=>{
         topparser.stop()
     },10000)
 ```
 
-## On Windows PC you can use WSL (windows subsystem for linux)
+## Options
+``` javascript
 
-#Example
-raw top output
-``` text
-top - 21:34:01 up  2:00,  3 users,  load average: 0.42, 0.18, 0.31
-Tasks: 197 total,   2 running, 195 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  0.8 us,  3.1 sy,  0.1 ni, 95.0 id,  0.4 wa,  0.6 hi,  0.0 si,  0.0 st
-KiB Mem:    727308 total,   663876 used,    63432 free,     4992 buffers
-KiB Swap:   753660 total,   309592 used,   444068 free.   163452 cached Mem
+var options={
+              pid_limit:10,//limit number of included pids in list (default: unlimited)
+              pid_filter:(proc)=>{return proc.user=="root"?proc:null},// filtering the pid list (for example: include only pid with user == root) (default: null)
+              pid_sort:(a,b)=>{return a.cpu-b.cpu},// sorting pid list by cpu usage (default)
+            }
 
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
-10175 root      20   0  124140  78220  44200 R  68.0 10.8   0:07.20 python
- 1359 root      20   0  528700 105328  19052 S  11.3 14.5  12:52.64 Xorg
-10206 alex      20   0   24952   1512   1060 R  11.3  0.2   0:00.18 top
- 1990 alex      20   0 1560256  89708  21168 S   5.7 12.3  13:28.23 cinnamon
-    1 root      20   0   37352   5688    488 S   0.0  0.8   0:04.93 init
-    2 root      20   0       0      0      0 S   0.0  0.0   0:00.07 kthreadd
-    3 root      20   0       0      0      0 S   0.0  0.0   0:54.12 ksoftirqd/0
-    4 root      20   0       0      0      0 S   0.0  0.0   0:00.00 kworker/0:0
-    5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/0:+
-    6 root      20   0       0      0      0 S   0.0  0.0   0:15.60 kworker/u1+
-    7 root      20   0       0      0      0 S   0.0  0.0   1:26.53 rcu_sched
-    8 root      20   0       0      0      0 S   0.0  0.0   0:25.33 rcuos/0
-    9 root      20   0       0      0      0 S   0.0  0.0   0:18.47 rcuos/1
-   10 root      20   0       0      0      0 S   0.0  0.0   0:17.37 rcuos/2
-   11 root      20   0       0      0      0 S   0.0  0.0   0:15.33 rcuos/3
-   12 root      20   0       0      0      0 S   0.0  0.0   0:15.10 rcuos/4
-   13 root      20   0       0      0      0 S   0.0  0.0   0:13.57 rcuos/5
-   14 root      20   0       0      0      0 S   0.0  0.0   0:15.09 rcuos/6
-   15 root      20   0       0      0      0 S   0.0  0.0   0:13.89 rcuos/7
-   16 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcu_bh
-   17 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcuob/0
+
+    //start topparser, with options (optional): pid_limit, pid_sort, pid_filter
+    topparser.start(options)
+    ....
 ```
 
 JSON output:
 ``` 
-{ 
-  task: { total: 194, running: 1, sleeping: 193, stopped: 0, zombie: 0 },
-  cpu: { user: 0.9,system: 3.1,ni: 0.1,'idle': 95,wa: 0.3,hi: 0.6,si: 0,st: 0 },
-  ram: { total: 727308, used: 664028, free: 63280, buffers: 7600 },
-  swap: { total: 753660, used: 309516, free: 444144, cachedMem: 187424 } },
-  processes: 
-   [ { pid: '1990',
-       user: 'alex',
-       pr: '20',
-       ni: '0',
-       virt: '1560516',
-       res: '90656',
-       shr: '21864',
-       s: 'S',
-       cpu: '6.1',
-       mem: '12.5',
-       time: '13:46.58',
-       command: 'cinnamon' },
-     { pid: '5381',
-       user: 'alex',
-       pr: '20',
-       ni: '0',
-       virt: '929508',
-       res: '119792',
-       shr: '8132',
-       s: 'S',
-       cpu: '6.1',
-       mem: '16.5',
-       time: '11:14.11',
-       command: 'firefox' },
-     { pid: '0245',
-       user: 'alex',
-       pr: '20',
-       ni: '0',
-       virt: '24948',
-       res: '1508',
-       shr: '1056',
-       s: 'R',
-       cpu: '6.1',
-       mem: '0.2',
-       time: '0:00.02',
-       command: 'top' },
-     { pid: '1',
-       user: 'root',
-       pr: '20',
-       ni: '0',
-       virt: '37352',
-       res: '5688',
-       shr: '488',
-       s: 'S',
-       cpu: '0.0',
-       mem: '0.8',
-       time: '0:04.93',
-       command: 'init' },
-     { pid: '2',
-       user: 'root',
-       pr: '20',
-       ni: '0',
-       virt: '0',
-       res: '0',
-       shr: '0',
-       s: 'S',
-       cpu: '0.0',
-       mem: '0.0',
-       time: '0:00.07',
-       command: 'kthreadd' },
-     { pid: '3',
-       user: 'root',
-       pr: '20',
-       ni: '0',
-       virt: '0',
-       res: '0',
-       shr: '0',
-       s: 'S',
-       cpu: '0.0',
-       mem: '0.0',
-       time: '0:54.23',
-       command: 'ksoftirqd/0' },
-     { pid: '4',
-       user: 'root',
-       pr: '20',
-       ni: '0',
-       virt: '0',
-       res: '0',
-       shr: '0',
-       s: 'S',
-       cpu: '0.0',
-       mem: '0.0',
-       time: '0:00.00',
-       command: 'kworker/0:0' }
-],
+{
+  "top": {
+    "time": "01:50:41",
+    "up_hours": "2:21",
+    "users": "0",
+    "load_average": [
+      "0.52",
+      "0.58",
+      "0.59"
+    ]
+  },
+  "tasks": {
+    "total": "17",
+    "running": "1",
+    "sleeping": "16",
+    "stopped": "0",
+    "zombie": "0"
+  },
+  "cpu": {
+    "us": "17.5",
+    "sy": "4.7",
+    "ni": "0.0",
+    "id": "77.5",
+    "wa": "0.0",
+    "hi": "0.4",
+    "si": "0.0",
+    "st": "0.0"
+  },
+  "mem": {
+    "total": "33411872",
+    "used": "16217872",
+    "free": "16964648",
+    "buff_cache": "229352"
+  },
+  "swap": {
+    "used": "186300",
+    "avail_mem": "17060268"
+  },
+  "processes": [
+    [
+      {
+        "pid": "1",
+        "user": "root",
+        "pr": "20",
+        "ni": "0",
+        "virt": "8892",
+        "res": "312",
+        "shr": "272",
+        "s": "S",
+        "cpu": "0.0",
+        "mem": "0.0",
+        "time": "0:00.07",
+        "command": "init"
+      },
+      {
+        "pid": "8",
+        "user": "root",
+        "pr": "20",
+        "ni": "0",
+        "virt": "8908",
+        "res": "232",
+        "shr": "180",
+        "s": "S",
+        "cpu": "0.0",
+        "mem": "0.0",
+        "time": "0:00.01",
+        "command": "init"
+      }
+    ]
+  ]
+}
 ```

@@ -4,16 +4,13 @@ var spawn = require('child_process').spawn
 var proc=null
 var startTime=0
 
+var new_parser=require("./new_parser.js")
+
 class TopEmitter extends EventEmitter {}
 
 var topEmitter = new TopEmitter()
 
-// {
-// 	pid_limit:10,//limit number of process to be parsed
-// }
-topEmitter.start=(options)=>{//pid_limit,callback
-	var options=options||{}
-
+topEmitter.start=(options={})=>{
 	startTime=new Date().getTime()
 	proc= spawn('top', ['-b',"-d","1"])// linux top command parameter: ['-b',"-d","1"]
 	var top_data=""
@@ -42,10 +39,12 @@ topEmitter.start=(options)=>{//pid_limit,callback
 			var end=_data.indexOf("top - ",start+1)
 			if(end==-1||end==start){return}
 			var data=_data.slice(start,end)
-				//console.dir(parser.parse(data,3))
-				var result=parser.parse(data,options.pid_limit)
-					//result.time-=startTime
-					//result.time*=1000
+
+			var result=new_parser(data,options)
+
+				// console.dir(parser.parse(data,3))
+				// var result=parser.parse(data,options.pid_limit)
+
 				topEmitter.emit("data",result)
 				top_data=_data.replace(data,"")
 			return true

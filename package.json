@@ -1,6 +1,6 @@
 {
   "name": "topparser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Parse linux TOP command output to JSON format.",
   "main": "index.js",
   "scripts": {
@@ -14,12 +14,23 @@
   "keywords": [
     "top",
     "linux",
+    "unix",
     "parser",
     "json",
     "command",
     "format",
     "node",
-    "js"
+    "js",
+    "pid",
+    "usage",
+    "cpu",
+    "ram",
+    "swap",
+    "uptime",
+    "memory",
+    "load",
+    "processes",
+    "command"
   ],
   "author": "alex",
   "license": "GPL",
