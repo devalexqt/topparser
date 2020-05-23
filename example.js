@@ -19,7 +19,7 @@ var topparser=require("./index.js")//topparser
 
     //if some error happens
     topparser.on("error",error=>{
-        console.log("ERROR::::::",error)
+        console.log(error)
     })
 
     //if topparser exit

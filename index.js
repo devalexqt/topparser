@@ -46,10 +46,7 @@ topEmitter.start=(options={})=>{
 			}catch(error){
 				topEmitter.emit("error",{error:error})
 			}
-
-				// console.dir(parser.parse(data,3))
-				// var result=parser.parse(data,options.pid_limit)
-
+			
 				topEmitter.emit("data",result)
 				top_data=_data.replace(data,"")
 			return true

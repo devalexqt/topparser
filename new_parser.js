@@ -33,9 +33,10 @@ function parseStatLine(line,options,error){
 function parseProcessLine(str,error){
     var result={}
     var regex=/(?<=)\S+/g //capture values beetween spaces
-    data=[...str.matchAll(regex)]
     var result={}
     try{
+        var data=[...str.matchAll(regex)]
+            
         result= {
             "pid":data[0][0],
             "user":data[1][0],
