@@ -40,7 +40,12 @@ topEmitter.start=(options={})=>{
 			if(end==-1||end==start){return}
 			var data=_data.slice(start,end)
 
-			var result=new_parser(data,options)
+			var result={}
+			try{
+				result=new_parser(data,options,error=>{topEmitter.emit("error",{error})})
+			}catch(error){
+				topEmitter.emit("error",{error:error})
+			}
 
 				// console.dir(parser.parse(data,3))
 				// var result=parser.parse(data,options.pid_limit)

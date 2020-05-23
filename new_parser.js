@@ -1,66 +1,6 @@
 //https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 
-function parseSwap(str){
-    var regex_root=/Swap/g
-        if(!regex_root.exec(str)){
-            return {}
-        }//swap
-
-    var result={}
-
-    var regex_total=/(\d+) total/g;
-    var regex_used=/(\d+) used/g;
-    var regex_free=/(\d+) free/g;
-    var regex_cached_mem=/(\d+) cached Mem/g;
-    var regex_avail_memm=/(\d+) avail Mem/g;
-
-    var total=regex_total.exec(str)
-        if(total){result.total=total[1]}
-
-    var used=regex_used.exec(str)
-        if(used){result.used=used[1]}    
-
-    var free=regex_free.exec(str)
-        if(free){result.free=free[1]}
-        
-    var cached_mem=regex_cached_mem.exec(str)
-        if(cached_mem){result.cached_mem=cached_mem[1]}    
-
-    var avail_memm=regex_avail_memm.exec(str)
-        if(avail_memm){result.avail_memm=avail_memm[1]}
-
-    return result
-}//parseSwap
-
-function parseMem(str){
-    var regex_root=/Mem/g
-    if(!regex_root.exec(str)){
-        return {}
-    }//swap
-
-    var result={}
-
-    var regex_total=/(\d+) total/g;
-    var regex_used=/(\d+) used/g;
-    var regex_free=/(\d+) free/g;
-    var regex_cached_mem=/(\d+) buff\/cache/g;
-
-    var total=regex_total.exec(str)
-        if(total){result.total=total[1]}
-
-    var used=regex_used.exec(str)
-        if(used){result.used=used[1]}    
-
-    var free=regex_free.exec(str)
-        if(free){result.free=free[1]}
-        
-    var cached_mem=regex_cached_mem.exec(str)
-        if(cached_mem){result.cached_mem=cached_mem[1]}    
-
-    return result
-}//parseMem
-
-function parseStatLine(line,options){
+function parseStatLine(line,options,error){
     line=line.replace(/ +(?= )/g,'')// replace multiple spaces
 
     if(!options.root.regex.exec(line)){
@@ -69,44 +9,49 @@ function parseStatLine(line,options){
 
     var result={}
     var tmp=null
+    try{
+        options.params.forEach(item=>{
+            item.keys=item.keys||1
+            tmp=item.regex.exec(line)
+            if(tmp){
+                if(!item.keys||item.keys==1){result[item.name]=tmp[1]}      
+                else{
+                    var subarray=[]
+                    for(var i=1;i<item.keys+1;i++){
+                        subarray.push(tmp[i])
+                    }//for
+                    result[item.name]=subarray
+                }//else
+            }//if
+        })
+    }catch(err){error(err)}
 
-    options.params.forEach(item=>{
-        item.keys=item.keys||1
-        tmp=item.regex.exec(line)
-        if(tmp){
-            if(!item.keys||item.keys==1){result[item.name]=tmp[1]}      
-            else{
-                var subarray=[]
-                for(var i=1;i<item.keys+1;i++){
-                    subarray.push(tmp[i])
-                }//for
-                result[item.name]=subarray
-            }//else
-        }//if
-    })
     return result
 }//parseCpu
 
 
-function parseProcessLine(str){
+function parseProcessLine(str,error){
     var result={}
     var regex=/(?<=)\S+/g //capture values beetween spaces
-
-    result=[...str.matchAll(regex)]
-    return {
-        "pid":result[0][0],
-        "user":result[1][0],
-        "pr":result[2][0],
-        "ni":result[3][0],
-        "virt":result[4][0],
-        "res":result[5][0],
-        "shr":result[6][0],
-        "s":result[7][0],
-        "cpu":result[8][0],
-        "mem":result[9][0],
-        "time":result[10][0],
-        "command":result[11][0],
-    }
+    data=[...str.matchAll(regex)]
+    var result={}
+    try{
+        result= {
+            "pid":data[0][0],
+            "user":data[1][0],
+            "pr":data[2][0],
+            "ni":data[3][0],
+            "virt":data[4][0],
+            "res":data[5][0],
+            "shr":data[6][0],
+            "s":data[7][0],
+            "cpu":data[8][0],
+            "mem":data[9][0],
+            "time":data[10][0],
+            "command":data[11][0],
+        }
+    }catch(err){error(err)}
+    return result
 }//parseRootTopLine
 
 
@@ -119,9 +64,8 @@ function parseProcessLine(str){
 //     pid_sort:(a,b)=>{return a.cpu-b.cpu},// sorting pid list by cpu usage (default)
 // }
 
-module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}}){
+module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}},error=(error)=>{/*parser error messages*/ console.log(error)}){
     var data=data.split("\n").filter(v=>v!="")
-
     var result={
 
         top:parseStatLine(data[0],
@@ -138,7 +82,7 @@ module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}}){
                     // {regex: /(\d+) zombie/g, name:"zombie"},
                 ]
     
-            }
+            },error
         ),//stat 
 
         tasks:parseStatLine(data[1],
@@ -152,7 +96,7 @@ module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}}){
                     {regex: /(\d+) zombie/g, name:"zombie"},
                 ]
     
-            }
+            },error
         ),//stat    
 
         cpu:parseStatLine(data[2],
@@ -168,7 +112,7 @@ module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}}){
                     {regex: /(\d+\.\d) si/g, name:"si"},
                     {regex: /(\d+\.\d) st/g, name:"st"},
                 ]
-            }
+            },error
         ),//stat
 
         mem:parseStatLine(data[3],
@@ -195,17 +139,20 @@ module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}}){
                     {regex: /(\d+) cached Mem/g, name:"cached_mem"},
                     {regex: /(\d+) avail Mem/g, name:"avail_mem"},
                 ]
-            }
+            },error
         ),//stat
             
         processes:[...( [            
                 (()=>{
                     var result=[]
                     for (var i=5;i<data.length-1;i++){
-                        var proc=parseProcessLine(data[i])
-                        if(typeof options.pid_filter=="function"){//pid filter function
-                            proc=options.pid_filter(proc)
-                        }//if
+                        var proc=null
+                        try{
+                            var proc=parseProcessLine(data[i])
+                            if(typeof options.pid_filter=="function"){
+                                proc=options.pid_filter(proc)
+                            }//if
+                        }catch(err){error(err)}
                         proc?result.push(proc):null                        
                     }//for
                     return result.slice(0,options.pid_limit||result.length).sort(options.pid_sort)
