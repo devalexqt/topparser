@@ -36,7 +36,7 @@ function parseProcessLine(str,error){
     var result={}
     try{
         var data=[...str.matchAll(regex)]
-            
+
         result= {
             "pid":data[0][0],
             "user":data[1][0],
@@ -149,7 +149,7 @@ module.exports=function(data,options={pid_sort(a,b){return a.cpu-b.cpu}},error=(
                     for (var i=5;i<data.length-1;i++){
                         var proc=null
                         try{
-                            var proc=parseProcessLine(data[i])
+                            var proc=parseProcessLine(data[i],error)
                             if(typeof options.pid_filter=="function"){
                                 proc=options.pid_filter(proc)
                             }//if
