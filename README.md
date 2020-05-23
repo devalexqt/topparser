@@ -1,5 +1,5 @@
 ## Parse linux / Unix "top" command to json format
-Parse unix TOP command raw output to JSON format using <b>node.js</b> without external dependencies. On Windows PC you can use WSL (windows subsystem for linux).
+Parse unix `top` command raw output to JSON format using <b>node.js</b> without external dependencies. On Windows PC you can use WSL (windows subsystem for linux).
 
 ## Test
 Just run:
@@ -20,7 +20,6 @@ npm install topparser
 ## Usage
 ``` javascript
 var topparser=require("topparser")
-
 
     //start topparser
     topparser.start()
