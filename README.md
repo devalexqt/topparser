@@ -60,7 +60,7 @@ var options={
     ....
 ```
 
-JSON output:
+Result JSON output:
 ``` 
 {
   "top": {
